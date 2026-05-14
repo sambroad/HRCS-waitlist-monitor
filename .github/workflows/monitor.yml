@@ -2,8 +2,12 @@ name: Monitor Hudson Sailing Events
 
 on:
   schedule:
-    # Every 15 minutes. Note: GitHub may delay scheduled runs during peak load.
-    - cron: "*/15 * * * *"
+    # Every 15 minutes, deliberately offset from :00/:15/:30/:45 to dodge
+    # peak load on the GitHub Actions scheduler (which silently delays or
+    # skips runs at popular times). Note: GitHub never guarantees on-time
+    # cron runs — delays of several minutes are normal, and the very first
+    # run after enabling a workflow can take up to an hour.
+    - cron: "7,22,37,52 * * * *"
   workflow_dispatch: {}  # allows manual runs from the Actions tab
 
 # Allow the workflow to commit updated state back to the repo.
