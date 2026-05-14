@@ -285,17 +285,21 @@ def save_state(path: Path, state: dict) -> None:
 
 
 def notify(topic: str, title: str, message: str, click_url: str | None = None) -> None:
-    headers = {
-        "Title": title,
-        "Priority": "high",
-        "Tags": "sailboat,bell",
+    # Use ntfy's JSON API rather than the header-based one, because HTTP
+    # headers are restricted to latin-1 and our title may contain emoji or
+    # other Unicode characters.
+    payload: dict = {
+        "topic": topic,
+        "title": title,
+        "message": message,
+        "priority": 4,  # high
+        "tags": ["sailboat", "bell"],
     }
     if click_url:
-        headers["Click"] = click_url
+        payload["click"] = click_url
     resp = requests.post(
-        f"https://ntfy.sh/{topic}",
-        data=message.encode("utf-8"),
-        headers=headers,
+        "https://ntfy.sh/",
+        json=payload,
         timeout=REQUEST_TIMEOUT,
     )
     resp.raise_for_status()
